@@ -125,6 +125,7 @@ def steal_library_header(url, proxy):
 def get_cookie_string_browser(url, proxy):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
+    options.add_argument('log-level=3')
     if proxy != None:
         options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(chrome_options=options)
@@ -135,7 +136,7 @@ def get_cookie_string_browser(url, proxy):
     for cookie in cookies:
         cookie_value_list.append(cookie['name'] + '=' + cookie['value'])
     cookie_value = ';'.join(cookie_value_list)
-    user_agent = driver.execute_script("return navigator.userAgent;")
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
     driver.quit()
     return cookie_value, user_agent
 
@@ -148,7 +149,8 @@ def get_library_html(url, header, proxy):
                 rqs = get(url, headers=header, proxies=proxy, timeout=(6, 7), allow_redirects=False)
             else:
                 rqs = get(url, headers=header, timeout=(6, 7), allow_redirects=False)
-        except:
+        except Exception as e:
+            print(e)
             print('    >打开网页失败，重新尝试...')
             continue
         rqs.encoding = 'utf-8'
@@ -157,7 +159,14 @@ def get_library_html(url, header, proxy):
         if search(r'JAVLibrary', rqs_content):        # 得到想要的网页，直接返回
             return rqs_content, header
         elif search(r'jav', rqs_content):           # 搜索车牌后，javlibrary跳转前的网页
-            url = url[:23] + search(r'(\?v=jav.+?)"', rqs_content).group(1)    # rqs_content是一个非常简短的跳转网页，内容是目标jav所在网址
+            try:
+                url = url[:23] + search(r'(\?v=jav.+?)"', rqs_content).group(1)    # rqs_content是一个非常简短的跳转网页，内容是目标jav所在网址
+            except Exception as e:
+                print(e)
+                with open('test.txt', 'w') as ttst:
+                    ttst.write(rqs_content)
+                    ttst.close()
+                exit()
             if len(url) > 70:                          # 跳转车牌特别长，cf已失效
                 header = steal_library_header(url[:23], proxy)  # 更新header后继续请求
                 continue
