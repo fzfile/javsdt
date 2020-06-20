@@ -366,16 +366,16 @@ while input_start_key == '':
                     title = titleg.group(1)
                 # 第二种情况：搜索结果可能是两个以上，所以这种匹配找不到标题，None！
                 else:   # 找“可能是多个结果的网页”上的所有“box”
-                    list_search_results = findall(r'v=javli(.+?)" title="(.+?-\d+?[a-z]? .+?)"', html_web)     # 这个正则表达式可以忽略avop-00127bod，它是近几年重置的，信息冗余
+                    list_search_results = findall(r'v=jav(.+?)" title="(.+?-\d+?[a-z]? .+?)"', html_web)     # 这个正则表达式可以忽略avop-00127bod，它是近几年重置的，信息冗余
                     # 从这些搜索结果中，找到最正确的一个
                     if list_search_results:
                         # 默认用第一个搜索结果
-                        url_first_result = url_web + '?v=javli' + list_search_results[0][0]
+                        url_first_result = url_web + '?v=jav' + list_search_results[0][0]
                         # 在javlibrary上搜索 SSNI-589 SNIS-459 这两个车牌，你就能看懂下面的if
                         if len(list_search_results) > 1 and not list_search_results[1][1].endswith('ク）'):  # ク）是蓝光重置版
                             # print(list_search_results)
                             if list_search_results[0][1].endswith('ク）'):   # 排在第一个的是蓝光重置版，比如SSNI-589（ブルーレイディスク），它的封面不正常，跳过它
-                                url_first_result = url_web + '?v=javli' + list_search_results[1][0]
+                                url_first_result = url_web + '?v=jav' + list_search_results[1][0]
                             elif list_search_results[1][1].split(' ', 1)[0] == jav_raw_num:  # 不同的片，但车牌完全相同，比如id-020。警告用户，但默认用第一个结果。
                                 bool_unique = False
                                 num_fail += 1
