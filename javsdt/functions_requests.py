@@ -2,11 +2,9 @@
 from os import system
 from re import search, findall
 from time import sleep
-from sys import exit
 from requests import Session, get, post
 from PIL import Image
 from cloudscraper import get_cookie_string
-from selenium import webdriver
 # from traceback import format_exc
 
 # 功能：请求各大jav网站和arzon的网页
@@ -110,35 +108,17 @@ def steal_library_header(url, proxy):
     for retry in range(10):
         try:
             if proxy:
-                cookie_value, user_agent = get_cookie_string_browser(url, proxy = proxy)
+                cookie_value, user_agent = get_cookie_string(url, proxies=proxy, timeout=15)
             else:
-                cookie_value, user_agent = get_cookie_string_browser(url, proxy = None)
+                cookie_value, user_agent = get_cookie_string(url, timeout=15)
             print('通过5秒检测！\n')
             return {'User-Agent': user_agent, 'Cookie': cookie_value}
-        except Exception as e:
-            print(e)
+        except:
+            # print(format_exc())
             print('通过失败，重新尝试...')
             continue
     print('>>通过javlibrary的5秒检测失败：', url)
-    exit()
-
-def get_cookie_string_browser(url, proxy):
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument('log-level=3')
-    if proxy != None:
-        options.add_argument('--proxy-server=%s' % proxy)
-    driver = webdriver.Chrome(chrome_options=options)
-    driver.get(url)
-    sleep(10)
-    cookies = driver.get_cookies()
-    cookie_value_list = []
-    for cookie in cookies:
-        cookie_value_list.append(cookie['name'] + '=' + cookie['value'])
-    cookie_value = ';'.join(cookie_value_list)
-    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
-    driver.quit()
-    return cookie_value, user_agent
+    system('pause')
 
 
 # 搜索javlibrary，或请求javlibrary上jav所在网页，返回html
@@ -149,8 +129,7 @@ def get_library_html(url, header, proxy):
                 rqs = get(url, headers=header, proxies=proxy, timeout=(6, 7), allow_redirects=False)
             else:
                 rqs = get(url, headers=header, timeout=(6, 7), allow_redirects=False)
-        except Exception as e:
-            print(e)
+        except:
             print('    >打开网页失败，重新尝试...')
             continue
         rqs.encoding = 'utf-8'
@@ -159,14 +138,7 @@ def get_library_html(url, header, proxy):
         if search(r'JAVLibrary', rqs_content):        # 得到想要的网页，直接返回
             return rqs_content, header
         elif search(r'jav', rqs_content):           # 搜索车牌后，javlibrary跳转前的网页
-            try:
-                url = url[:23] + search(r'(\?v=jav.+?)"', rqs_content).group(1)    # rqs_content是一个非常简短的跳转网页，内容是目标jav所在网址
-            except Exception as e:
-                print(e)
-                with open('test.txt', 'w') as ttst:
-                    ttst.write(rqs_content)
-                    ttst.close()
-                exit()
+            url = url[:23] + search(r'(\?v=jav.+?)"', rqs_content).group(1)    # rqs_content是一个非常简短的跳转网页，内容是目标jav所在网址
             if len(url) > 70:                          # 跳转车牌特别长，cf已失效
                 header = steal_library_header(url[:23], proxy)  # 更新header后继续请求
                 continue
@@ -401,4 +373,3 @@ def download_pic(url, path, proxy):
             print('    >下载失败，重新下载....')
             continue
     raise Exception('    >下载多次，仍然失败！')
-
