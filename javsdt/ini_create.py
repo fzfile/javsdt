@@ -69,7 +69,7 @@ try:
     config_settings.set("信息来源", "列出车牌(素人为主，可自行添加)", "LUXU、MIUM、GANA、NTK、ARA、DCV、MAAN、HOI、NAMA、SWEET、SIRO、SCUTE、CUTE、SQB、JKZ、URF、SIMM、ORETD、PER、EZD、EVA、JAC、ORE、ION")
     config_settings.add_section("其他设置")
     config_settings.set("其他设置", "简繁中文？", "简")
-    config_settings.set("其他设置", "javlibrary网址", "http://www.p42u.com/")
+    config_settings.set("其他设置", "javlibrary网址", "http://www.g46e.com/")
     config_settings.set("其他设置", "javbus网址", "https://www.cdnbus.cloud/")
     config_settings.set("其他设置", "javdb网址", "https://javdb4.com/")
     config_settings.set("其他设置", "扫描文件类型", "MP4、MKV、AVI、WMV、ISO、RMVB、FLV、TS")

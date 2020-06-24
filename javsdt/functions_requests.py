@@ -2,9 +2,11 @@
 from os import system
 from re import search, findall
 from time import sleep
+from sys import exit
 from requests import Session, get, post
 from PIL import Image
 from cloudscraper import get_cookie_string
+from selenium import webdriver
 # from traceback import format_exc
 
 # 功能：请求各大jav网站和arzon的网页
@@ -108,17 +110,35 @@ def steal_library_header(url, proxy):
     for retry in range(10):
         try:
             if proxy:
-                cookie_value, user_agent = get_cookie_string(url, proxies=proxy, timeout=15)
+                cookie_value, user_agent = get_cookie_string_browser(url, proxy = proxy)
             else:
-                cookie_value, user_agent = get_cookie_string(url, timeout=15)
+                cookie_value, user_agent = get_cookie_string_browser(url, proxy = None)
             print('通过5秒检测！\n')
             return {'User-Agent': user_agent, 'Cookie': cookie_value}
-        except:
-            # print(format_exc())
+        except Exception as e:
+            print(e)
             print('通过失败，重新尝试...')
             continue
     print('>>通过javlibrary的5秒检测失败：', url)
-    system('pause')
+    exit()
+
+def get_cookie_string_browser(url, proxy):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument('log-level=3')
+    if proxy != None:
+        options.add_argument('--proxy-server=%s' % proxy)
+    driver = webdriver.Chrome(chrome_options=options)
+    driver.get(url)
+    sleep(10)
+    cookies = driver.get_cookies()
+    cookie_value_list = []
+    for cookie in cookies:
+        cookie_value_list.append(cookie['name'] + '=' + cookie['value'])
+    cookie_value = ';'.join(cookie_value_list)
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
+    driver.quit()
+    return cookie_value, user_agent
 
 
 # 搜索javlibrary，或请求javlibrary上jav所在网页，返回html
@@ -129,7 +149,8 @@ def get_library_html(url, header, proxy):
                 rqs = get(url, headers=header, proxies=proxy, timeout=(6, 7), allow_redirects=False)
             else:
                 rqs = get(url, headers=header, timeout=(6, 7), allow_redirects=False)
-        except:
+        except Exception as e:
+            print(e)
             print('    >打开网页失败，重新尝试...')
             continue
         rqs.encoding = 'utf-8'
