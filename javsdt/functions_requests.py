@@ -110,9 +110,9 @@ def steal_library_header(url, proxy):
     for retry in range(10):
         try:
             if proxy:
-                cookie_value, user_agent = get_cookie_string_browser(url, proxy = proxy)
+                cookie_value, user_agent = get_cookie_string(url, proxy = proxy)
             else:
-                cookie_value, user_agent = get_cookie_string_browser(url, proxy = None)
+                cookie_value, user_agent = get_cookie_string(url)
             print('通过5秒检测！\n')
             return {'User-Agent': user_agent, 'Cookie': cookie_value}
         except Exception as e:
@@ -394,4 +394,3 @@ def download_pic(url, path, proxy):
             print('    >下载失败，重新下载....')
             continue
     raise Exception('    >下载多次，仍然失败！')
-
