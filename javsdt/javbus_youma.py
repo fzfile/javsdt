@@ -304,11 +304,9 @@ while input_start_key == '':
     num_warn = 0
     print('...文件扫描开始...如果时间过长...请避开中午夜晚高峰期...\n')
     # root【当前根目录】 dirs【子文件夹】 files【文件】，root是str，后两个是list
-    for root, dirs, files in os.walk(root_choose):
+    for root, dirs, files in os.walk(root_choose, topdown=True):
+        dirs[:] = [d for d in dirs if d not in ('归类完成')]
         if not files:
-            continue
-        if '归类完成' in root.replace(root_choose, ''):
-            # print('>>该文件夹在归类的根目录中，跳过处理...', root)
             continue
         if bool_skip and exist_nfo(files):
             # print(root+'sep+files[-1])      整理要跳过已存在nfo的文件夹，判断这一层文件夹最后两个文件是不是nfo
